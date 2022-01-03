@@ -1,7 +1,11 @@
 # inotify-copy
 
-docker base to copy new files from one location to another
+copy files from input to output directory.
+Leave original files untouched.
 
+## config
+
+INOTIFY_COPY_DELAY = a delay (`sleep`) before the copy starts.
 
 ## compose-example
 
@@ -11,7 +15,9 @@ services:
   copy-scan-to-backup:
     image: ghcr.io/longstone/inotify-copy
     container_name: copy-scan-backup
-    user: "501:20"
+        user: "${USR}:${GRP}"
+    environment:
+      - INOTIFY_COPY_DELAY=10s
     volumes:
       - /mnt/scan:/in
       - /mnt/backup:/out
