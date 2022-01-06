@@ -1,1 +1,3 @@
 test/.env
+test/in/*
+test/out/*
