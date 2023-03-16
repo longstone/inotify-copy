@@ -1,6 +1,7 @@
 # inotify-copy
 
-copy files from input to output directory.
+Copy files from input to output directory.  
+There is a delay (some scanners don't write the full file at once...).  
 Leave original files untouched.
 
 ## config
