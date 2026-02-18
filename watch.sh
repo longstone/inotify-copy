@@ -9,7 +9,7 @@ echo "$(date): INOTIFY_COPY_DELAY: $INOTIFY_COPY_DELAY"
 INOTIFY_COPY_DELAY=$INOTIFY_COPY_DELAY;
 while true; do
   # Watch for new files
-  inotifywait -m . -e create -e moved_to | while read PATH ACTION FILE
+  inotifywait -m . -e close_write | while read PATH ACTION FILE
   do
        echo "$(/bin/date): event $ACTION, detected file: $FILE, copy it in $INOTIFY_COPY_DELAY Seconds"
        (/bin/sleep "$INOTIFY_COPY_DELAY"; /bin/cp -v "/in/$FILE" "/out") &
