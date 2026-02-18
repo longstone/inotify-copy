@@ -1,17 +1,23 @@
 #!/bin/sh
+set -eu
 
-cd "/in"
-${INOTIFY_COPY_DELAY:=0}
+IN_DIR="${IN_DIR:-/in}"
+OUT_DIR="${OUT_DIR:-/out}"
+: "${INOTIFY_COPY_DELAY:=0}"
+
 echo "$(date): Startup"
-echo "$(date): Working with id: $(id) and in directory $(pwd)"
-echo "$(date): Starting the work with /in and /out ... "
-echo "$(date): INOTIFY_COPY_DELAY: $INOTIFY_COPY_DELAY"
-INOTIFY_COPY_DELAY=$INOTIFY_COPY_DELAY;
-while true; do
-  # Watch for new files
-  inotifywait -m . -e close_write | while read PATH ACTION FILE
-  do
-       echo "$(/bin/date): event $ACTION, detected file: $FILE, copy it in $INOTIFY_COPY_DELAY Seconds"
-       (/bin/sleep "$INOTIFY_COPY_DELAY"; /bin/cp -v "/in/$FILE" "/out") &
-  done
+echo "$(date): Watching $IN_DIR -> $OUT_DIR (delay=${INOTIFY_COPY_DELAY}s)"
+
+cd "$IN_DIR"
+
+inotifywait -m -e close_write -e moved_to --format '%e|%f' . |
+while IFS='|' read -r action file; do
+  echo "$(date): event=$action file=$file -> copy in ${INOTIFY_COPY_DELAY}s"
+
+  (
+    sleep "$INOTIFY_COPY_DELAY"
+    tmp="${file}.part.$$"
+    cp -v -- "$IN_DIR/$file" "$OUT_DIR/$tmp" &&
+    mv -v -- "$OUT_DIR/$tmp" "$OUT_DIR/$file"
+  ) &
 done
