@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   copy-scan-to-backup:
     image: longstone/inotify-copy:dev
